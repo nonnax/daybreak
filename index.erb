@@ -1,0 +1,491 @@
+<%
+  def highlight(code)
+    IO.popen("pygmentize -f html -l ruby", 'w+') do |p|
+      p.puts code
+      p.close_write
+      p.read
+    end
+  end
+%>
+<!doctype html>
+<html>
+  <head>
+    <title>Daybreak</title>
+<!--
+             ^^            |
+  daybreak     ^^        \ _ /
+                      -= /   \ =-
+~^~ ^ ^~^~ ~^~ ~ ~^~~^~^-=~=~=-~^~^~^~
+
+-->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <style>
+      /* reset */
+      div, html, body {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        vertical-align: baseline;
+      }
+
+      ul { list-style: none; padding-left: 10px;}
+      li { margin-bottom: 1em; }
+      /* text styles */
+      body {
+        font-family: "Helvetica Nueue", Helvetica, sans-serif;
+        font-size: 14px;
+        line-height: 1.7em;
+        margin-left: auto;
+        margin-right: auto;
+        width: 600px;
+        padding: 20px;
+      }
+      p, li {
+        width: 600px;
+        margin: 0px 0px 1em;
+      }
+
+      p.badges {
+        text-align: right;
+      }
+
+      h1, h2, h3 {
+        text-rendering: optimizeLegibility;
+        margin-left: -5px;
+      }
+
+      h4 {
+        margin: 0px;
+        margin-top: 30px;
+        margin-left: -5px;
+        font-weight: normal;
+      }
+
+      h4 code {
+        padding: 4px;
+        background-color: #e6f3ff;
+      }
+
+      ol {
+        padding-left: 0px;
+      }
+
+      code, pre, tt { font-family: Monaco, monospace; font-size: 12px; }
+      tt { border:1px solid #efefef; padding: 2px;}
+      dd { margin-left: 0; }
+      dt { margin-left: 1em; }
+
+      a { color: black; }
+      a:hover { text-decoration: none; }
+      pre {
+        padding-left: 10px;
+        font-size: 12px;
+        border-left: 5px solid #efefef;
+        line-height: 1.3;
+      }
+
+      #logo {
+        border-left: 0px;
+      }
+
+      hr {
+        border: 0;
+        border-top: 1px solid #efefef;
+        height: 1px;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 1em;
+      }
+
+      table td, table th {
+        border: 1px solid #efefef;
+        margin: 0px 5px;
+        text-align: center;
+      }
+      table th {
+        width: 40%;
+      }
+
+      table th.crc {
+        width: 20%;
+      }
+
+      /* styles stolen from docco */
+      body .hll { background-color: #ffffcc }
+      body .c { color: #408080; font-style: italic }  /* Comment */
+      body .err { border: 1px solid #FF0000 }         /* Error */
+      body .k { color: #954121 }                      /* Keyword */
+      body .o { color: #666666 }                      /* Operator */
+      body .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+      body .cp { color: #BC7A00 }                     /* Comment.Preproc */
+      body .c1 { color: #408080; font-style: italic } /* Comment.Single */
+      body .cs { color: #408080; font-style: italic } /* Comment.Special */
+      body .gd { color: #A00000 }                     /* Generic.Deleted */
+      body .ge { font-style: italic }                 /* Generic.Emph */
+      body .gr { color: #FF0000 }                     /* Generic.Error */
+      body .gh { color: #000080; font-weight: bold }  /* Generic.Heading */
+      body .gi { color: #00A000 }                     /* Generic.Inserted */
+      body .go { color: #808080 }                     /* Generic.Output */
+      body .gp { color: #000080; font-weight: bold }  /* Generic.Prompt */
+      body .gs { font-weight: bold }                  /* Generic.Strong */
+      body .gu { color: #800080; font-weight: bold }  /* Generic.Subheading */
+      body .gt { color: #0040D0 }                     /* Generic.Traceback */
+      body .kc { color: #954121 }                     /* Keyword.Constant */
+      body .kd { color: #954121; font-weight: bold }  /* Keyword.Declaration */
+      body .kn { color: #954121; font-weight: bold }  /* Keyword.Namespace */
+      body .kp { color: #954121 }                     /* Keyword.Pseudo */
+      body .kr { color: #954121; font-weight: bold }  /* Keyword.Reserved */
+      body .kt { color: #B00040 }                     /* Keyword.Type */
+      body .m { color: #666666 }                      /* Literal.Number */
+      body .s { color: #219161 }                      /* Literal.String */
+      body .na { color: #7D9029 }                     /* Name.Attribute */
+      body .nb { color: #954121 }                     /* Name.Builtin */
+      body .nc { color: #0000FF; font-weight: bold }  /* Name.Class */
+      body .no { color: #880000 }                     /* Name.Constant */
+      body .nd { color: #AA22FF }                     /* Name.Decorator */
+      body .ni { color: #999999; font-weight: bold }  /* Name.Entity */
+      body .ne { color: #D2413A; font-weight: bold }  /* Name.Exception */
+      body .nf { color: #0000FF }                     /* Name.Function */
+      body .nl { color: #A0A000 }                     /* Name.Label */
+      body .nn { color: #0000FF; font-weight: bold }  /* Name.Namespace */
+      body .nt { color: #954121; font-weight: bold }  /* Name.Tag */
+      body .nv { color: #19469D }                     /* Name.Variable */
+      body .ow { color: #AA22FF; font-weight: bold }  /* Operator.Word */
+      body .w { color: #bbbbbb }                      /* Text.Whitespace */
+      body .mf { color: #666666 }                     /* Literal.Number.Float */
+      body .mh { color: #666666 }                     /* Literal.Number.Hex */
+      body .mi { color: #666666 }                     /* Literal.Number.Integer */
+      body .mo { color: #666666 }                     /* Literal.Number.Oct */
+      body .sb { color: #219161 }                     /* Literal.String.Backtick */
+      body .sc { color: #219161 }                     /* Literal.String.Char */
+      body .sd { color: #219161; font-style: italic } /* Literal.String.Doc */
+      body .s2 { color: #219161 }                     /* Literal.String.Double */
+      body .se { color: #BB6622; font-weight: bold }  /* Literal.String.Escape */
+      body .sh { color: #219161 }                     /* Literal.String.Heredoc */
+      body .si { color: #BB6688; font-weight: bold }  /* Literal.String.Interpol */
+      body .sx { color: #954121 }                     /* Literal.String.Other */
+      body .sr { color: #BB6688 }                     /* Literal.String.Regex */
+      body .s1 { color: #219161 }                     /* Literal.String.Single */
+      body .ss { color: #19469D }                     /* Literal.String.Symbol */
+      body .bp { color: #954121 }                     /* Name.Builtin.Pseudo */
+      body .vc { color: #19469D }                     /* Name.Variable.Class */
+      body .vg { color: #19469D }                     /* Name.Variable.Global */
+      body .vi { color: #19469D }                     /* Name.Variable.Instance */
+      body .il { color: #666666 }                     /* Literal.Number.Integer.Long */
+    </style>
+  </head>
+  <body>
+    <p>
+<pre id="logo">
+                                 ^^            |
+                      daybreak     ^^        \ _ /
+                                          -= /   \ =-
+                    ~^~ ^ ^~^~ ~^~ ~ ~^~~^~^-=~=~=-~^~^~^~
+</pre>
+    <p>
+      <p class="badges">
+        <a href="http://rubygems.org/gems/daybreak"><img src="https://badge.fury.io/rb/daybreak.png"/></a>
+        <a href="http://travis-ci.org/propublica/daybreak"><img src="https://secure.travis-ci.org/propublica/daybreak.png?branch=master"/></a>
+      </p>
+      Daybreak is a simple and very fast key value store for ruby. It has user defined persistence,
+      and all data is stored in a table in memory, so ruby niceties are available.
+      Daybreak is faster than <tt>pstore</tt> and <tt>dbm</tt>.
+    </p>
+    <p>
+      The source is at <a href="http://github.com/propublica/daybreak">Github</a> and you can install it with:
+    </p>
+
+<pre>
+$ gem install daybreak
+</pre>
+
+    <p>(v<%= Daybreak::VERSION %>) | <a href="http://rdoc.info/github/propublica/daybreak/master/frames">API Docs</a> | <a href="http://github.com/propublica/daybreak/issues">Issue Tracker</a></p>
+
+    <h2>Overview</h2>
+
+    <p>
+      Daybreak stores data in an append-only file, and values inserted into the
+      database are marshalled ruby objects. It includes <tt>Enumerable</tt>
+      for functional methods like <tt>map</tt> and <tt>reduce</tt> and emulates
+      the interface of a simple ruby hash. Here is the basic api:
+    </p>
+
+    <code>
+<%= highlight <<-RUBY
+  require 'daybreak'
+
+  db = Daybreak::DB.new "example.db"
+
+  # set the value of a key
+  db['foo'] = 2
+
+  # set the value of a key and flush the change to disk
+  db.set! 'bar', 2
+
+  # You can also use atomic batch updates
+  db.update :alpha => 1, :beta => 2
+  db.update! :alpha => 1, :beta => 2
+
+  # all keys are cast to strings via #to_s
+  db[1] = 2
+  db.keys.include? 1 # => false
+  db.keys.include? '1' # => true
+
+  # ensure changes are sent to disk
+  db.flush
+
+  # open up another db client
+  db2 = Daybreak::DB.new "example2.db"
+  db2['foo'] = 3
+
+  # Ruby objects work too
+  db2['baz'] = {:one => 1}
+  db2.flush
+
+  # Reread the changed file in the first db
+  db.load
+  p db['foo'] #=> 3
+  p db['baz'] #=> {:one => 1}
+
+  # Enumerable works too!
+  1000.times {|i| db[i] = i }
+  p db.reduce(0) {|m, k, v| m + k.last } # => 499500
+
+  # Compaction is always a good idea. It will cut down on the size of the Database
+  db.compact
+  p db['foo'] #=> 1
+  db2.load
+  p db2['foo'] #=> 1
+
+  # DBs can accessed from multiple processes at the same
+  # time. You can use #lock to make an operation atomic.
+  db.lock do
+    db['counter'] += 1
+  end
+
+  # If you want to synchronize only between threads, prefer synchronize over lock!
+  db.synchronize do
+    db['counter'] += 1
+  end
+
+  # DBs can have default values
+  db3 = Daybreak::DB.new "example3.db", :default => 'hello!'
+  db3['bingo'] #=> hello!
+
+  # If you don't like Marshal as serializer, you can write your own
+  # serializer. Inherit Daybreak::Serializer::Default
+  db4 = Daybreak::DB.new "example4.db", :serializer => MyJsonSerializer
+
+  # close the databases
+  db.close
+  db2.close
+  db3.close
+  db4.close
+RUBY
+%>
+    </code>
+    <p>
+      You can provide your own serializer, see <tt>Daybreak::Serializer::Default</tt> if you want a different serialization
+      strategy (for example, JSON). You can also provide your own format, see <tt>Daybreak::Format</tt> if
+      you want to format your database log differently.
+    </p>
+    <h2>Architecture</h2>
+
+    <p>
+      When a Daybreak database is opened it reads the append only file and mirrors
+      the data in an in memory hash table for fast reads.
+    </p>
+
+    <p>
+      Writes to a Daybreak database are asynchronous and each write is queued.
+      If you want to commit immediately to the file call <tt>flush</tt> after a
+      write.
+    </p>
+
+    <p>
+      Daybreak is multi process safe. Synchronization with the other processes is
+      done by calling <tt>load</tt> or <tt>lock</tt>. <tt>load</tt> updates the
+      in memory hash table with new database records from the filesystem.
+      Use <tt>lock</tt> if you want to make operations atomic across process boundaries.
+    </p>
+
+    <p>
+      If you only want to synchronize between different threads, prefer <tt>synchronize</tt> over <tt>lock</tt>.
+      Be aware that Daybreak is not thread-safe by default, so all (!) accesses have to be wrapped by <tt>synchronize</tt>
+      (This statement is true at least on interpreters without global interpreter lock (Rubinius, JRuby)).
+    </p>
+
+    <p>
+      Writes with duplicate keys are simply appended to the end of the file.
+      From time to time you will want to run <tt>compact</tt> which will remove
+      old commits from the file and create a smaller logfile. This will shrink the
+      space necessary to store the data on disk. You can also compact from
+      a background process.
+    </p>
+
+    <h2>File Format</h2>
+
+    <p>
+      Daybreak stores its data in a very simple file format. Each
+      Daybreak file is an append only log consisting of 32 bit big endian key length, 32 bit big endian
+      value length, key data and value data.
+      Every key-value pair also has an associated 32 bit CRC field to protect against bad data.
+      The special value 0xFFFFFFFF for the value length denotes a deleted record.
+      Here is how a database of one record might look:
+    </p>
+
+      <table>
+        <tr>
+          <th class="key">32 bit Key length</th>
+          <th class="key">32 bit Value length</th>
+          <th class="key">Key</th>
+          <th class="key">Value</th>
+          <th class="key">CRC32</th>
+        </tr>
+        <tr>
+          <td>(...)0000101</td>
+          <td>(...)0001010</td>
+          <td>hello</td>
+          <td>&lt;marshalled value&gt;</td>
+	        <td>(...)11010</td>
+        </tr>
+      </table>
+
+    <p>
+      These values are all read into an in memory hash table and commits to the
+      database are queued for writing.
+      A reminder: Call <tt>flush</tt> if you want commits to block and be written
+      to the filesystem.
+    </p>
+
+    <h2>In the Wild</h2>
+    <ul>
+      <li>
+        The <a href="http://projects.propublica.org/emails/">Message Machine</a> uses
+        Daybreak to store word frequencies and indexes for search and document
+        clustering.
+      </li>
+    </ul>
+
+    <h2>Testing &amp; Benchmarks</h2>
+
+    <p>
+      Daybreak is tested using <a href="https://travis-ci.org/propublica/daybreak">Travis-CI</a>. We
+      also run benchmarks there, which compare Daybreak against DBM, GDBM and Hash.
+    </p>
+
+    <p>
+      If you are interested in benchmarks, you can also take a look at the <a href="https://travis-ci.org/minad/moneta">Moneta benchmarks</a>,
+      where Daybreak is compared to virtually all existing key/value stores. It seems to be the fastest persistent
+      database from all the Moneta backends.
+<pre>
+=============================================================================
+Summary uniform_medium: 3 runs, 1000 keys
+=============================================================================
+                         Minimum  Maximum    Total     Mean   Stddev    Ops/s
+Memory            sum         17       19       55       18        0    53725
+Daybreak          sum         20       26       68       22        2    44036
+LevelDB           sum         40       44      129       43        1    23176
+TDB               sum         40       53      148       49        6    20192
+GDBM              sum         39       70      151       50       14    19832
+DBM               sum         38       77      171       57       16    17491
+LRUHash           sum         56       99      211       70       20    14177
+Sqlite            sum        134      167      438      146       15     6845
+File              sum        333      444     1190      396       46     2519
+HashFile          sum        471      494     1451      483        9     2066
+Redis             sum        656      818     2218      739       65     1352
+MemcachedDalli    sum        700     1051     2532      844      150     1184
+MemcachedNative   sum        822      979     2661      887       66     1127
+Client            sum        906      970     2814      938       26     1065
+Sequel            sum       2090     2635     6992     2330      227      429
+Mongo             sum       2053     2704     7108     2369      265      422
+DataMapper        sum       7984    11287    27909     9303     1428      107
+Couch             sum      15481    18786    51336    17112     1349       58
+Riak              sum      15597    22437    56838    18946     2794       52
+PStore            sum      15975    26684    59356    19785     4887       50
+ActiveRecord      sum      27526    32525    89807    29935     2044       33
+RestClient        sum     122103   122781   367042   122347      307        8
+</pre>
+    </p>
+
+    <h2>Change Log</h2>
+
+    <dl>
+      <dd><b>0.3.0</b></dd>
+      <dt>
+        Speed up read performance, and a slight change to <tt>Daybreak::Format</tt>
+        which now is responsible for reading the entire database in one go, and
+        yielding records as they are parsed.
+      </dt>
+      <dd><b>0.2.4</b></dd>
+      <dt>Fix possible infinite loops when the worker thread thows an error.</dt>
+      <dd><b>0.2.3</b></dd>
+      <dt>Fix a bug with utf-8 strings (thanks <a href="https://github.com/pepe">pepe</a>).</dt>
+      <dd><b>0.2.2</b></dd>
+      <dt>Move file handling bits to <tt>Journal</tt>, and fix a bug with <tt>compact!</tt>,
+        and rename <tt>sync</tt> to <tt>load</tt> (or <tt>sunrise</tt> if you're feeling fun).</dt>
+      <dd><b>0.2.1</b></dd>
+      <dt>Add bulk updates with <tt>update</tt> and it's friend <tt>update!</tt>.
+        and add a subclass fix (thanks <a href="https://github.com/ch1c0t">ch1c0t</a>).</dt>
+      <dd><b>0.2.0</b></dd>
+      <dt>
+        Pretty much a complete rewrite by <a href="https://github.com/minad">minad</a>
+        to allow for multi-process safety and thread safety.
+        Huge speed improvements and the ability to define custom formats and serializers.<br>
+        <strong>Note:</strong> Old db formats from previous versions will need to be
+          upgraded, use <a href="https://github.com/propublica/daybreak/blob/master/script/converter">
+          the converter</a> to upgrade your old databases.
+      </dt>
+      <dd><b>0.1.3</b></dd>
+      <dt>Simplify internals, and speed up both reading and writing.</dt>
+      <dd><b>0.1.2</b></dd>
+      <dt>Fix <tt>compact!</tt> segfault or deadlock on 1.8.7-p371, and huge cleanup and speedup thanks to <a href="https://github.com/minad">minad</a>!</dt>
+      <dd><b>0.1.1</b></dd>
+      <dt>Fix file handling and possible segfault on some systems when using <tt>clear</tt></dt>
+      <dd><b>0.1.0</b></dd>
+      <dt>Make Daybreak compatible with <a href="https://github.com/minad/moneta">Moneta</a>, and add a delete operation. This represents a slight change to the log file format. (thanks <a href="https://github.com/minad">minad</a>)</dt>
+      <dd><b>0.0.4</b></dd>
+      <dt>Fix a bug in compact! to allow for inhherited DBs (thanks <a href="https://github.com/jlapier">jlapier</a>)</dt>
+      <dd><b>0.0.3</b></dd>
+      <dt>Add support for windows rubies (thanks to <a href="https://github.com/rob99">rob99</a>
+        for help tracking down the issue.)</dt>
+      <dd><b>0.0.2</b></dd>
+      <dt>Fix bug with calls to <tt>empty!</tt>.</dt>
+      <dd><b>0.0.1</b></dd>
+      <dt>Initial release.</dt>
+    </dl>
+
+    <h2>License</h2>
+
+<pre>
+Copyright (c) 2012 - 2013 ProPublica
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+</pre>
+
+    <p><em>Daybreak is a project of ProPublica.</em></p>
+  </body>
+</html>
